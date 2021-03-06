@@ -1,6 +1,10 @@
 package com.example.demo.model;
 
 public class UserModel {
+    public UserModel(String email, String password){
+        this.email = email;
+        this.password = password;
+    }
     private String email;
 
     public String getEmail() {
