@@ -1,19 +1,27 @@
 package com.example.demo.viewmodel;
 
+import android.content.SharedPreferences;
 import android.graphics.ColorSpace;
 import android.text.TextUtils;
 import android.util.Patterns; 
 import androidx.databinding.BaseObservable; 
 import androidx.databinding.Bindable;
+import androidx.lifecycle.MutableLiveData;
 
 import com.example.demo.BR;
+import com.example.demo.data.repositry.AppPreferencesHelper;
 import com.example.demo.model.UserModel;
+import com.example.demo.view.LoginActivity;
 
-public class AppViewModel extends BaseObservable { 
+import java.util.ArrayList;
 
+import static android.content.Context.MODE_PRIVATE;
+
+public class AppViewModel extends BaseObservable {
+	public MutableLiveData<UserModel> mutableLiveData=new MutableLiveData<>();
 	// creating object of Model class 
 	private UserModel model;
-
+	AppPreferencesHelper appPreferencesHelper;
 	// string variables for 
 	// toast messages 
 	private String successMessage = "Login successful"; 
@@ -74,8 +82,8 @@ public class AppViewModel extends BaseObservable {
 	} 
 
 	// constructor of ViewModel class 
-	public AppViewModel() { 
-
+	public AppViewModel(LoginActivity loginActivity) {
+		appPreferencesHelper=new AppPreferencesHelper(loginActivity,"sharedprefrence");
 		// instantiating object of 
 		// model class 
 		model = new UserModel("","");
@@ -86,9 +94,13 @@ public class AppViewModel extends BaseObservable {
 	// the LOGIN button 
 	public void onButtonClicked() { 
 		if (isValid()) {
-			//setToastMessage(successMessage);
+		//setToastMessage(successMessage);
+			appPreferencesHelper.setCurrentUserEmail(getUserEmail());
 			messageId = START_SOME_ACTIVITY;
 			notifyPropertyChanged(BR.messageId);
+
+		}else {
+			setToastMessage(errorMessage);
 		}
 
 	} 
@@ -99,5 +111,11 @@ public class AppViewModel extends BaseObservable {
 	public boolean isValid() { 
 		return !TextUtils.isEmpty(getUserEmail()) && Patterns.EMAIL_ADDRESS.matcher(getUserEmail()).matches() 
 				&& getUserPassword().length() > 5; 
-	} 
+	}
+
+
+	public MutableLiveData<UserModel> getMutableLiveData() {
+		mutableLiveData.setValue(model);
+		return mutableLiveData;
+	}
 }
